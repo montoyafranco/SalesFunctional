@@ -1,10 +1,15 @@
 package com.sales.functional;
 
 import com.sales.functional.database.Database;
+import com.sales.functional.entities.Product;
 import com.sales.functional.entities.Sale;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class SalesFunctionalApp {
     static ArrayList<Sale> sales = Database.loadDatabase();
@@ -22,13 +27,16 @@ public class SalesFunctionalApp {
         //TO DO:
         System.out.println("6. Total payment per customer");
         System.out.println("7. Sales where customer are women that purchase In Store");
-        System.out.println("8. How many products per tags customers bought");
+        System.out.println("8. /*What is the product by a specific customer with the largest and lowest quantity?\n" +
+                "    Expected output:  Ask for customer’s mail and then show customer’s mail, and the product with the respective quantity.\n" +
+                "*/");
         System.out.println("9. How many men and women uses coupon");
         System.out.println("10. Customer that spent more and less");
 
     }
 
     public static void loadMenu(){
+
         Scanner sc = new Scanner(System.in);
         menu();
         System.out.print("Type option: ");
@@ -52,12 +60,38 @@ public class SalesFunctionalApp {
                 System.out.print("What qualification do you need (1-5): ");
                 //salesBySatisfaction(sc.nextLine());
                 break;
+            case "8":
+                System.out.println("What is the product by a specific customer with the largest and lowest quantity?\n" +
+                        "    Expected output:  Ask for customer’s mail and then show customer’s " +
+                        "mail, and the product with the respective quantity.");
+
+                productSortCostumer();
             default:
                 System.out.println("Invalid input. Try again.");
         }
 
     }
+    public static  void productSortCostumer(){
+        Scanner sc = new Scanner(System.in);
+        String op1 = sc.nextLine();
+        Predicate<Sale> clientChosen = sale -> sale.getCustomer().getEmail().equals(op1);
 
+       Sale result = sales.stream()
+                .filter(clientChosen)
+                .collect(Collectors.toCollection(ArrayList::new)).get(0);
+
+        Collections.sort(result.getItems() ,(first ,last) ->(int) (first.getQuantity() - last.getQuantity()));
+        int indexLast = result.getItems().size() - 1;
+
+        System.out.println("Client Mail " + op1 + " Most Quantity product " + result.getItems().get(indexLast).getQuantity()
+        + result.getItems().get(indexLast).getName());
+        System.out.println("Client Mail :" + op1 + " Lest Quantity product " + result.getItems().get(0).getQuantity()
+        + result.getItems().get(0).getName());
+
+    }
+/*What is the product by a specific customer with the largest and lowest quantity?
+    Expected output:  Ask for customer’s mail and then show customer’s mail, and the product with the respective quantity.
+*/
     //TO DO: Make 7 to solve: 5 in class, 5 as hw
 
     //1. Get all sales with purchased method 'Online'
